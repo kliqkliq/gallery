@@ -29,7 +29,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_albums, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item, parent, false);
         return new ViewHolder(view);
     }
 

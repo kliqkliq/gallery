@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     @Override
     public void onAlbumInteraction(JsonItem item) {
-        final Fragment fragment = ImagesFragment.newInstance(3, item.getName());
+        final Fragment fragment = ImagesFragment.newInstance(item.getName());
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack("").commit();
     }
 
