@@ -5,7 +5,8 @@ import java.util.List;
 class JsonItem {
     String name;
     List<JsonItem> children;
-    String mUrl;
+    String thumbUrl;
+    String imageUrl;
 
     public String getName() {
         return name;
@@ -15,11 +16,19 @@ class JsonItem {
         return children;
     }
 
-    public String getUrl() {
-        return mUrl;
+    public String getThumbUrl() {
+        return thumbUrl;
     }
 
-    public void setUrl(String url) {
-        mUrl = url;
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setThumbUrl(String url) {
+        thumbUrl = url;
+    }
+
+    public void setImageUrl(String url) {
+        imageUrl = url;
     }
 }

@@ -51,19 +51,23 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     private List<JsonItem> buildList(JsonItem data, String url) {
         final List<JsonItem> list = data.getChildren();
-        String itemUrl = url + "/" + Uri.encode(data.getName());
+        String baseUrl = url + "/" + Uri.encode(data.getName());
+        String thumbUrl = "";
+        String imageUrl = "";
 
         if (list == null) {
-            itemUrl = itemUrl + ".thumbnail";
+            thumbUrl = baseUrl + ".thumbnail";
+            imageUrl = baseUrl + ".jpg";
         }
-        data.setUrl(itemUrl);
+        data.setThumbUrl(thumbUrl);
+        data.setImageUrl(imageUrl);
 
         if (list != null) {
             for (final JsonItem item : list) {
-                buildList(item, itemUrl);
+                buildList(item, baseUrl);
             }
             // set random thumb
-            data.setUrl(list.get(mRandomGenerator.nextInt(list.size())).getUrl());
+            data.setThumbUrl(list.get(mRandomGenerator.nextInt(list.size())).getThumbUrl());
         }
         return list;
     }

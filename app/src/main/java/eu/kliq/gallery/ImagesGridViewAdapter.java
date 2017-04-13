@@ -41,7 +41,7 @@ public class ImagesGridViewAdapter extends ArrayAdapter<JsonItem> {
         }
 
         final JsonItem item = mItems.get(position);
-        Glide.with(mContext).load(item.getUrl()).into(holder.thumbView);
+        Glide.with(mContext).load(item.getThumbUrl()).centerCrop().into(holder.thumbView);
         return row;
     }
 

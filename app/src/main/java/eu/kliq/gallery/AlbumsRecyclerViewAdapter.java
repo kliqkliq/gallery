@@ -38,7 +38,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         final JsonItem item = mValues.get(position);
         holder.mItem = item;
         holder.mNameView.setText(item.getName());
-        Glide.with(holder.mThumbView.getContext()).load(item.getUrl()).into(holder.mThumbView);
+        Glide.with(holder.mThumbView.getContext()).load(item.getThumbUrl()).centerCrop().into(holder.mThumbView);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
