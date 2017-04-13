@@ -1,6 +1,5 @@
 package eu.kliq.gallery;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,13 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImagesFragment extends Fragment implements OnListChangedListener {
 
     private static final String ARG_ALBUM_NAME = "album-name";
     private String mAlbumName = "";
-    private OnImagesFragmentInteractionListener mListener;
     private MainActivity mActivity;
     private ImagesGridViewAdapter mAdapter;
     private GridView mGridView;
@@ -48,20 +48,16 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                  @Override
                  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                     final JsonItem item = (JsonItem) parent.getItemAtPosition(position);
-                     final ImageView imageView = (ImageView) view.findViewById(R.id.thumb);
 
                      final Intent intent = new Intent(mActivity, ImageActivity.class);
-                     int[] screenLocation = new int[2];
-                     imageView.getLocationOnScreen(screenLocation);
+                     final List<JsonItem> images =  mActivity.getAlbum(mAlbumName).getChildren();
+                     final ArrayList<String> urls = new ArrayList<>();
 
-                     //Pass the image title and url to DetailsActivity
-                     intent.putExtra("left", screenLocation[0]).
-                             putExtra("top", screenLocation[1]).
-                             putExtra("width", imageView.getWidth()).
-                             putExtra("height", imageView.getHeight()).
-                             putExtra("thumb", item.getThumbUrl()).
-                             putExtra("image", item.getImageUrl());
+                     for (JsonItem image : images) {
+                         urls.add(image.getBaseUrl());
+                     }
+
+                     intent.putExtra("position", position).putStringArrayListExtra("images", urls);
 
                      startActivity(intent);
                  }
@@ -78,27 +74,7 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnImagesFragmentInteractionListener) {
-            mListener = (OnImagesFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnImagesFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
     public void onListChanged() {
         loadData();
-    }
-
-    public interface OnImagesFragmentInteractionListener {
-        void onImageInteraction(JsonItem item);
     }
 }

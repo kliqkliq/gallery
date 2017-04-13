@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener,
-        ImagesFragment.OnImagesFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener{
 
     private static final String BASE_URL = "http://kliq.eu/galeria2";
     private static final String JSON_URL = BASE_URL + "/data.json";
@@ -52,22 +51,14 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private List<JsonItem> buildList(JsonItem data, String url) {
         final List<JsonItem> list = data.getChildren();
         String baseUrl = url + "/" + Uri.encode(data.getName());
-        String thumbUrl = "";
-        String imageUrl = "";
-
-        if (list == null) {
-            thumbUrl = baseUrl + ".thumbnail";
-            imageUrl = baseUrl + ".jpg";
-        }
-        data.setThumbUrl(thumbUrl);
-        data.setImageUrl(imageUrl);
+        data.setBaseUrl(baseUrl);
 
         if (list != null) {
             for (final JsonItem item : list) {
                 buildList(item, baseUrl);
             }
             // set random thumb
-            data.setThumbUrl(list.get(mRandomGenerator.nextInt(list.size())).getThumbUrl());
+            data.setBaseUrl(list.get(mRandomGenerator.nextInt(list.size())).getBaseUrl());
         }
         return list;
     }
@@ -76,11 +67,6 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     public void onAlbumInteraction(JsonItem item) {
         final Fragment fragment = ImagesFragment.newInstance(item.getName());
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack("").commit();
-    }
-
-    @Override
-    public void onImageInteraction(JsonItem item) {
-
     }
 
     public class FetchDataTask extends AsyncTask<Object, Object, JsonItem> {
