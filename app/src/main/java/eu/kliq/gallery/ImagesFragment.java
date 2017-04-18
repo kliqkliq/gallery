@@ -14,8 +14,6 @@ import java.util.List;
 
 public class ImagesFragment extends Fragment implements OnListChangedListener {
 
-    private static final String ARG_ALBUM_NAME = "album-name";
-    private String mAlbumName = "";
     private MainActivity mActivity;
     private ImagesGridViewAdapter mAdapter;
     private GridView mGridView;
@@ -23,21 +21,14 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
     public ImagesFragment() {
     }
 
-    public static ImagesFragment newInstance(String name) {
-        ImagesFragment fragment = new ImagesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_ALBUM_NAME, name);
-        fragment.setArguments(args);
-        return fragment;
+    public static ImagesFragment newInstance() {
+        return new ImagesFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = (MainActivity) getActivity();
-        if (getArguments() != null) {
-            mAlbumName = getArguments().getString(ARG_ALBUM_NAME, "");
-        }
     }
 
     @Override
@@ -50,7 +41,7 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
                  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                      final Intent intent = new Intent(mActivity, ImageActivity.class);
-                     final List<JsonItem> images =  mActivity.getAlbum(mAlbumName).getChildren();
+                     final List<JsonItem> images =  mActivity.getCurrentAlbum().getChildren();
                      final ArrayList<String> urls = new ArrayList<>();
 
                      for (JsonItem image : images) {
@@ -69,8 +60,11 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
     }
 
     private void loadData() {
-        mAdapter = new ImagesGridViewAdapter(mActivity, R.layout.image_item, mActivity.getAlbum(mAlbumName).getChildren());
-        mGridView.setAdapter(mAdapter);
+        final JsonItem album = mActivity.getCurrentAlbum();
+        if (mGridView != null && album != null) {
+            mAdapter = new ImagesGridViewAdapter(mActivity, R.layout.image_item, album.getChildren());
+            mGridView.setAdapter(mAdapter);
+        }
     }
 
     @Override

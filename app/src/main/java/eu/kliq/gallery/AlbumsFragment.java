@@ -33,19 +33,18 @@ public class AlbumsFragment extends Fragment implements OnListChangedListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_albums_list, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            final Context context = view.getContext();
-            mRecyclerView = (RecyclerView) view;
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        }
+        final Context context = view.getContext();
+        mRecyclerView = (RecyclerView) view;
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         loadData();
         return view;
     }
 
     private void loadData() {
-        mAdapter = new AlbumsRecyclerViewAdapter(mActivity.getAlbums(), mListener);
-        mRecyclerView.setAdapter(mAdapter);
+        if (mRecyclerView != null) {
+            mAdapter = new AlbumsRecyclerViewAdapter(mActivity.getAlbums(), mListener);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 
     @Override

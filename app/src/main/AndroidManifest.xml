@@ -20,7 +20,7 @@
         </activity>
 
         <activity android:name=".ImageActivity"
-                  android:theme="@style/Transparent" />
+                  android:theme="@style/Fullscreen" />
     </application>
 
 </manifest>

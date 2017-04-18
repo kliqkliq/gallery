@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -16,7 +17,12 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     private static final String BASE_URL = "http://kliq.eu/galeria2";
     private static final String JSON_URL = BASE_URL + "/data.json";
+    private static final String ITEMS_JSON_KEY = "items-json-key";
+    private static final String ALBUM_NAME_KEY = "album-name-key";
+    private String mItemsJson;
+    private String mCurrentAlbumName;
     private List<JsonItem> mItemList = new ArrayList<>();
+    private JsonItem mCurrentAlbum;
     private Random mRandomGenerator;
 
     @Override
@@ -26,9 +32,20 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, AlbumsFragment.newInstance()).commit();
+            final FetchDataTask task = new FetchDataTask();
+            task.execute();
+        } else {
+            mCurrentAlbumName = savedInstanceState.getString(ALBUM_NAME_KEY);
+            mItemsJson = savedInstanceState.getString(ITEMS_JSON_KEY);
+            generateJsonItem();
         }
-        final FetchDataTask task = new FetchDataTask();
-        task.execute();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ITEMS_JSON_KEY, mItemsJson);
+        outState.putString(ALBUM_NAME_KEY, mCurrentAlbumName);
     }
 
     public List<JsonItem> getAlbums() {
@@ -37,20 +54,38 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     public JsonItem getAlbum(String name) {
         for (final JsonItem item : mItemList) {
-            if (item.getName() == name) {
+            if (item.getName().equals(name)) {
                 return item;
             }
         }
         return null;
     }
 
+    public JsonItem getCurrentAlbum() {
+        if (mCurrentAlbum == null) {
+            mCurrentAlbum = getAlbum(mCurrentAlbumName);
+        }
+        return mCurrentAlbum;
+    }
+
     private Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.container);
     }
 
+    private void generateJsonItem() {
+        final Gson gson = new Gson();
+        final Type collectionType = new TypeToken<JsonItem>(){}.getType();
+        final JsonItem data = gson.fromJson(mItemsJson, collectionType);
+        if (data != null) {
+            mItemList = buildList(data, BASE_URL);
+            final OnListChangedListener fragment = (OnListChangedListener) getCurrentFragment();
+            fragment.onListChanged();
+        }
+    }
+
     private List<JsonItem> buildList(JsonItem data, String url) {
         final List<JsonItem> list = data.getChildren();
-        String baseUrl = url + "/" + Uri.encode(data.getName());
+        final String baseUrl = url + "/" + Uri.encode(data.getName());
         data.setBaseUrl(baseUrl);
 
         if (list != null) {
@@ -65,27 +100,23 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     @Override
     public void onAlbumInteraction(JsonItem item) {
-        final Fragment fragment = ImagesFragment.newInstance(item.getName());
+        mCurrentAlbum = item;
+        mCurrentAlbumName = item.getName();
+        final Fragment fragment = ImagesFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack("").commit();
     }
 
-    public class FetchDataTask extends AsyncTask<Object, Object, JsonItem> {
+    public class FetchDataTask extends AsyncTask<Void, Void, String> {
 
         @Override
-        protected JsonItem doInBackground(Object... params) {
-            final String data = JsonHelper.getJSON(JSON_URL);
-            final Gson gson = new Gson();
-            final Type collectionType = new TypeToken<JsonItem>(){}.getType();
-            return gson.fromJson(data, collectionType);
+        protected String doInBackground(Void... params) {
+            return JsonHelper.getJSON(JSON_URL);
         }
 
         @Override
-        protected void onPostExecute(JsonItem result) {
-            if (result != null) {
-                mItemList = buildList(result, BASE_URL);
-                final OnListChangedListener fragment = (OnListChangedListener) getCurrentFragment();
-                fragment.onListChanged();
-            }
+        protected void onPostExecute(String result) {
+            mItemsJson = result;
+            generateJsonItem();
         }
     }
 }
