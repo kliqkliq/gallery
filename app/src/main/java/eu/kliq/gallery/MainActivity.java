@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -24,12 +25,16 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private List<JsonItem> mItemList = new ArrayList<>();
     private JsonItem mCurrentAlbum;
     private Random mRandomGenerator;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRandomGenerator = new Random();
         setContentView(R.layout.activity_main);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, AlbumsFragment.newInstance()).commit();
             final FetchDataTask task = new FetchDataTask();
