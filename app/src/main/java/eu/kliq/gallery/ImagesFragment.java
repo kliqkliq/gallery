@@ -42,7 +42,7 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
                  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                      final Intent intent = new Intent(mActivity, ImageActivity.class);
-                     final List<JsonItem> images =  mActivity.getCurrentAlbum().getChildren();
+                     final List<JsonItem> images =  mActivity.getGalleryManager().getCurrentAlbum().getChildren();
                      final ArrayList<String> urls = new ArrayList<>();
 
                      for (JsonItem image : images) {
@@ -62,7 +62,7 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
     }
 
     private void loadData() {
-        final JsonItem album = mActivity.getCurrentAlbum();
+        final JsonItem album = mActivity.getGalleryManager().getCurrentAlbum();
         if (mGridView != null && album != null) {
             mAdapter = new ImagesGridViewAdapter(mActivity, R.layout.image_item, album.getChildren());
             mGridView.setAdapter(mAdapter);

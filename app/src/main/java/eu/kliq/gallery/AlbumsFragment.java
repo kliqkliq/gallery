@@ -42,7 +42,7 @@ public class AlbumsFragment extends Fragment implements OnListChangedListener {
 
     private void loadData() {
         if (mRecyclerView != null) {
-            mAdapter = new AlbumsRecyclerViewAdapter(mActivity.getAlbums(), mListener);
+            mAdapter = new AlbumsRecyclerViewAdapter(mActivity.getGalleryManager().getAlbums(), mListener);
             mRecyclerView.setAdapter(mAdapter);
         }
     }
