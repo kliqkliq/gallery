@@ -4,11 +4,16 @@ import java.util.List;
 
 class JsonItem {
     String name;
+    String date;
     List<JsonItem> children;
     String baseUrl;
 
     public String getName() {
         return name;
+    }
+
+    public String getDate() {
+        return date;
     }
 
     public List<JsonItem> getChildren() {

@@ -38,6 +38,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         final JsonItem item = mValues.get(position);
         holder.mItem = item;
         holder.mNameView.setText(item.getName());
+        holder.mDateView.setText(item.getDate());
         Glide.with(holder.mThumbView.getContext()).load(item.getThumbUrl()).centerCrop().into(holder.mThumbView);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -58,6 +59,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mNameView;
+        public final TextView mDateView;
         public final ImageView mThumbView;
         public JsonItem mItem;
 
@@ -65,6 +67,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
             super(view);
             mView = view;
             mNameView = (TextView) view.findViewById(R.id.name);
+            mDateView = (TextView) view.findViewById(R.id.date);
             mThumbView = (ImageView) view.findViewById(R.id.thumb);
         }
 
