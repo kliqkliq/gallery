@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private static final String ITEMS_JSON_KEY = "items-json-key";
     private static final String ALBUM_NAME_KEY = "album-name-key";
     private String mItemsJson;
-    private String mCurrentAlbumName;
     private GalleryManager mGalleryManager;
     private Toolbar mToolbar;
     private TextView mTitle;
@@ -43,11 +42,12 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
             final FetchDataTask task = new FetchDataTask();
             task.execute();
         } else {
-            mCurrentAlbumName = savedInstanceState.getString(ALBUM_NAME_KEY);
             mItemsJson = savedInstanceState.getString(ITEMS_JSON_KEY);
-            updateTitle();
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
             mGalleryManager.init(mItemsJson, listener);
+            final String name = savedInstanceState.getString(ALBUM_NAME_KEY);
+            mGalleryManager.setCurrentAlbum(name);
+            updateTitle();
         }
     }
 
@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ITEMS_JSON_KEY, mItemsJson);
-        outState.putString(ALBUM_NAME_KEY, mCurrentAlbumName);
+        final JsonItem item = mGalleryManager.getCurrentAlbum();
+        outState.putString(ALBUM_NAME_KEY, item == null ? "" : item.getName());
     }
 
     private Fragment getCurrentFragment() {
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private void updateTitle() {
         final Fragment fragment = getCurrentFragment();
         if (fragment instanceof ImagesFragment) {
-            setTitle(mCurrentAlbumName);
+            setTitle(mGalleryManager.getCurrentAlbum().getName());
         } else {
             setTitle(getString(R.string.app_name));
         }
@@ -78,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     @Override
     public void onAlbumInteraction(JsonItem item) {
         mGalleryManager.setCurrentAlbum(item);
-        mCurrentAlbumName = item.getName();
         final Fragment fragment = ImagesFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack("").commit();
     }

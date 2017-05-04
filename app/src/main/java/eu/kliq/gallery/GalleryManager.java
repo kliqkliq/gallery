@@ -68,10 +68,12 @@ public class GalleryManager {
         mCurrentAlbum = item;
     }
 
+    public void setCurrentAlbum(String name) {
+        setCurrentAlbum(getAlbum(name));
+    }
+
     public JsonItem getCurrentAlbum() {
-//        if (mCurrentAlbum == null) {
-//            mCurrentAlbum = getAlbum(mCurrentAlbumName);
-//        }
         return mCurrentAlbum;
     }
+
 }
