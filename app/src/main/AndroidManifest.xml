@@ -20,6 +20,8 @@
 
         <activity android:name=".ImageActivity"
                   android:theme="@style/Fullscreen" />
+
+        <meta-data android:name="eu.kliq.gallery.GlideConfiguration" android:value="GlideModule"/>
     </application>
 
 </manifest>
