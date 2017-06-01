@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">KLiQ.eu</string>
+    <string name="version_name" translatable="false">%1$s v %2$s</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="author" translatable="false">Sebastian Klikowicz</string>
+    <string name="email" translatable="false">kliqkliq@gmail.com</string>
 </resources>

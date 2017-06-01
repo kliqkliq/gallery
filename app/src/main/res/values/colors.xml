@@ -5,4 +5,5 @@
     <color name="colorAccent">#B4D0F0</color>
     <color name="background">#222</color>
     <color name="albumName">#94D0FF</color>
+    <color name="appName">#94D0FF</color>
 </resources>
