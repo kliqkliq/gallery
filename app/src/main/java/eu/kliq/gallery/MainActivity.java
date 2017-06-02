@@ -1,5 +1,7 @@
 package eu.kliq.gallery;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -14,6 +16,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.TextAppearanceSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -23,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     private static final String ITEMS_JSON_KEY = "items-json-key";
     private static final String ALBUM_NAME_KEY = "album-name-key";
+    private static final String PREF_SORTING_TYPE_KEY = "sorting-type-key";
+    private static final int DEFAULT_SORT_TYPE_VALUE = 1;
     private String mItemsJson;
     private GalleryManager mGalleryManager;
     private Toolbar mToolbar;
@@ -43,15 +49,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        View header = mNavigationView.getHeaderView(0);
-        TextView appNameAndVersion = (TextView) header.findViewById(R.id.app_name_version);
-        appNameAndVersion.setText(getString(R.string.version_name, getString(R.string.app_name), BuildConfig.VERSION_NAME));
-
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
-        mNavigationView.setNavigationItemSelectedListener(this);
+        setNavigationDrawer();
 
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.addOnBackStackChangedListener(this);
@@ -65,11 +63,46 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         } else {
             mItemsJson = savedInstanceState.getString(ITEMS_JSON_KEY);
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
-            mGalleryManager.init(mItemsJson, listener);
+            mGalleryManager.init(mItemsJson, listener, getSortType());
             final String name = savedInstanceState.getString(ALBUM_NAME_KEY);
             mGalleryManager.setCurrentAlbum(name);
             updateTitle();
         }
+    }
+
+    private void setNavigationDrawer() {
+        // Set header
+        final View header = mNavigationView.getHeaderView(0);
+        final TextView appNameAndVersion = (TextView) header.findViewById(R.id.app_name_version);
+        appNameAndVersion.setText(getString(R.string.version_name, BuildConfig.VERSION_NAME));
+
+        // Set sorting group header
+        final MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.sorting);
+        final SpannableString string = new SpannableString(menuItem.getTitle());
+        string.setSpan(new TextAppearanceSpan(this, R.style.MenuGroupNameTextAppearance), 0, string.length(), 0);
+        menuItem.setTitle(string);
+
+        // Highlight sort type
+        final GalleryManager.SORT_TYPE sortType = getSortType();
+        int sortTypeId = DEFAULT_SORT_TYPE_VALUE;
+        if (sortType == GalleryManager.SORT_TYPE.DATE_ASC) {
+            sortTypeId = R.id.sort_by_date_asc;
+        } else if (sortType == GalleryManager.SORT_TYPE.DATE_DESC) {
+            sortTypeId = R.id.sort_by_date_desc;
+        } else if (sortType == GalleryManager.SORT_TYPE.NAME_ASC) {
+            sortTypeId = R.id.sort_by_name_asc;
+        } else if (sortType == GalleryManager.SORT_TYPE.NAME_DESC) {
+            sortTypeId = R.id.sort_by_date_desc;
+        }
+        mNavigationView.setCheckedItem(sortTypeId);
+
+        // Set drawer toggle
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+
+        mNavigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -95,6 +128,12 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         } else {
             setTitle(getString(R.string.app_name));
         }
+    }
+
+    private GalleryManager.SORT_TYPE getSortType() {
+        final SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int value = sharedPref.getInt(PREF_SORTING_TYPE_KEY, DEFAULT_SORT_TYPE_VALUE);
+        return GalleryManager.SORT_TYPE.values()[value];
     }
 
     @Override
@@ -129,6 +168,36 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         final int id = item.getItemId();
+        final GalleryManager.SORT_TYPE sortType;
+
+        switch (id) {
+            case R.id.sort_by_date_asc: {
+                sortType = GalleryManager.SORT_TYPE.DATE_ASC;
+                break;
+            }
+            case R.id.sort_by_date_desc: {
+                sortType = GalleryManager.SORT_TYPE.DATE_DESC;
+                break;
+            }
+            case R.id.sort_by_name_asc: {
+                sortType = GalleryManager.SORT_TYPE.NAME_ASC;
+                break;
+            }
+            case R.id.sort_by_name_desc: {
+                sortType = GalleryManager.SORT_TYPE.NAME_DESC;
+                break;
+            }
+            default:
+                sortType = GalleryManager.SORT_TYPE.DATE_ASC;
+                break;
+        }
+
+        mGalleryManager.setSortingType(sortType);
+
+        final SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(PREF_SORTING_TYPE_KEY, sortType.ordinal());
+        editor.commit();
 
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
@@ -154,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         protected void onPostExecute(String result) {
             mItemsJson = result;
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
-            mGalleryManager.init(mItemsJson, listener);
+            mGalleryManager.init(mItemsJson, listener, getSortType());
         }
     }
 }

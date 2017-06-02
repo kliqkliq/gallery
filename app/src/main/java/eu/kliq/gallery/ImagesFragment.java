@@ -73,4 +73,8 @@ public class ImagesFragment extends Fragment implements OnListChangedListener {
     public void onListChanged() {
         loadData();
     }
+
+    @Override
+    public void onSortChanged() {
+    }
 }

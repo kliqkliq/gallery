@@ -18,42 +18,21 @@ public class GalleryManager {
     public static final String JSON_URL = BASE_URL + "/data.json";
 
     public enum SORT_TYPE {
-        NAME_ASC, NAME_DESC, DATE_ASC, DATE_DESC
+        DATE_ASC, DATE_DESC, NAME_ASC, NAME_DESC
     }
+
+    private Random mRandomGenerator;
+    private List<JsonItem> mItemList = new ArrayList<>();
+    private JsonItem mCurrentAlbum;
+    private SORT_TYPE mSortType;
+    private OnListChangedListener mListener;
 
     public GalleryManager() {
         mRandomGenerator = new Random();
     }
 
-    private Random mRandomGenerator;
-    private List<JsonItem> mItemList = new ArrayList<>();
-
-    private JsonItem mCurrentAlbum;
-
     public List<JsonItem> getAlbums() {
         return mItemList;
-    }
-
-    public List<JsonItem> getAlbums(final SORT_TYPE type) {
-        final List<JsonItem> items = mItemList;
-        Collections.sort(items, new Comparator<JsonItem>() {
-            @Override
-            public int compare(JsonItem lhs, JsonItem rhs) {
-                switch (type) {
-                    case NAME_ASC:
-                        return lhs.name.compareTo(rhs.name);
-                    case NAME_DESC:
-                        return rhs.name.compareTo(lhs.name);
-                    case DATE_ASC:
-                        return lhs.date.compareTo(rhs.date);
-                    case DATE_DESC:
-                        return rhs.date.compareTo(lhs.date);
-                    default:
-                        return rhs.date.compareTo(lhs.date);
-                }
-            }
-        });
-        return items;
     }
 
     public JsonItem getAlbum(String name) {
@@ -65,14 +44,17 @@ public class GalleryManager {
         return null;
     }
 
-    public void init(String itemsJson, OnListChangedListener listener) {
+    public void init(String itemsJson, OnListChangedListener listener, SORT_TYPE sortType) {
+        mListener = listener;
+        mSortType = sortType;
         final Gson gson = new Gson();
         final Type collectionType = new TypeToken<JsonItem>(){}.getType();
         final JsonItem data = gson.fromJson(itemsJson, collectionType);
         if (data != null) {
             mItemList = buildList(data, BASE_URL);
-            if (listener != null) {
-                listener.onListChanged();
+            sortItems();
+            if (mListener != null) {
+                mListener.onListChanged();
             }
         }
     }
@@ -104,6 +86,35 @@ public class GalleryManager {
 
     public void setCurrentAlbum(String name) {
         setCurrentAlbum(getAlbum(name));
+    }
+
+
+    public void setSortingType(SORT_TYPE type) {
+        if (type != mSortType) {
+            mSortType = type;
+            sortItems();
+            mListener.onSortChanged();
+        }
+    }
+
+    private void sortItems() {
+        Collections.sort(mItemList, new Comparator<JsonItem>() {
+            @Override
+            public int compare(JsonItem lhs, JsonItem rhs) {
+                switch (mSortType) {
+                    case NAME_ASC:
+                        return lhs.name.compareTo(rhs.name);
+                    case NAME_DESC:
+                        return rhs.name.compareTo(lhs.name);
+                    case DATE_ASC:
+                        return lhs.date.compareTo(rhs.date);
+                    case DATE_DESC:
+                        return rhs.date.compareTo(lhs.date);
+                    default:
+                        return rhs.date.compareTo(lhs.date);
+                }
+            }
+        });
     }
 
     public JsonItem getCurrentAlbum() {

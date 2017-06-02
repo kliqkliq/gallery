@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sorting"
+          android:title="Sortowanie">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/sort_by_name_asc"
+                      android:title="Nazwa▼" />
+                <item android:id="@+id/sort_by_name_desc"
+                      android:title="Nazwa▲" />
+                <item android:id="@+id/sort_by_date_asc"
+                      android:title="Data▼" />
+                <item android:id="@+id/sort_by_date_desc"
+                      android:title="Data▲" />
+            </group>
+        </menu>
+    </item>
+</menu>
