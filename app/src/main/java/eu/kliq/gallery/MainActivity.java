@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
@@ -23,7 +24,7 @@ import android.view.View;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener,
-        FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener {
+        FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
 
     private static final String ITEMS_JSON_KEY = "items-json-key";
     private static final String ALBUM_NAME_KEY = "album-name-key";
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +50,11 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mAppBar = (AppBarLayout) findViewById(R.id.app_bar);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mSearchView = (SearchView) findViewById(R.id.search);
 
         setNavigationDrawer();
+        setSearchViewListeners();
 
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.addOnBackStackChangedListener(this);
@@ -103,6 +108,24 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mDrawerToggle.syncState();
 
         mNavigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void setSearchViewListeners() {
+        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTitle.setVisibility(View.GONE);
+            }
+        });
+
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                mTitle.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+        mSearchView.setOnQueryTextListener(this);
     }
 
     @Override
@@ -210,6 +233,18 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        mGalleryManager.setFilter(query);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        mGalleryManager.setFilter(newText);
+        return true;
     }
 
     public class FetchDataTask extends AsyncTask<Void, Void, String> {

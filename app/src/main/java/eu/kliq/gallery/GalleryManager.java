@@ -23,6 +23,7 @@ public class GalleryManager {
 
     private Random mRandomGenerator;
     private List<JsonItem> mItemList = new ArrayList<>();
+    private List<JsonItem> mItemListFiltered = new ArrayList<>();
     private JsonItem mCurrentAlbum;
     private SORT_TYPE mSortType;
     private OnListChangedListener mListener;
@@ -32,7 +33,7 @@ public class GalleryManager {
     }
 
     public List<JsonItem> getAlbums() {
-        return mItemList;
+        return mItemListFiltered;
     }
 
     public JsonItem getAlbum(String name) {
@@ -52,6 +53,8 @@ public class GalleryManager {
         final JsonItem data = gson.fromJson(itemsJson, collectionType);
         if (data != null) {
             mItemList = buildList(data, BASE_URL);
+            mItemListFiltered = new ArrayList<>();
+            mItemListFiltered.addAll(mItemList);
             sortItems();
             if (mListener != null) {
                 mListener.onListChanged();
@@ -88,7 +91,6 @@ public class GalleryManager {
         setCurrentAlbum(getAlbum(name));
     }
 
-
     public void setSortingType(SORT_TYPE type) {
         if (type != mSortType) {
             mSortType = type;
@@ -97,8 +99,22 @@ public class GalleryManager {
         }
     }
 
+    public void setFilter(String text) {
+        mItemListFiltered.clear();
+        if (text.isEmpty()) {
+            mItemListFiltered.addAll(mItemList);
+        } else {
+            for (JsonItem item: mItemList){
+                if (item.getName().toLowerCase().contains(text.toLowerCase())){
+                    mItemListFiltered.add(item);
+                }
+            }
+        }
+        mListener.onSortChanged();
+    }
+
     private void sortItems() {
-        Collections.sort(mItemList, new Comparator<JsonItem>() {
+        Collections.sort(mItemListFiltered, new Comparator<JsonItem>() {
             @Override
             public int compare(JsonItem lhs, JsonItem rhs) {
                 switch (mSortType) {

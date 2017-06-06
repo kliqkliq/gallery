@@ -37,6 +37,12 @@
                     android:textColor="@color/colorAccent"
                     android:textSize="22sp"/>
 
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/search"
+                    android:layout_gravity="right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
 
