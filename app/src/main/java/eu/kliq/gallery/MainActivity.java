@@ -11,6 +11,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,15 +22,20 @@ import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener,
-        FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+        FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener,
+        SearchView.OnQueryTextListener, CompoundButton.OnCheckedChangeListener {
 
-    private static final String ITEMS_JSON_KEY = "items-json-key";
-    private static final String ALBUM_NAME_KEY = "album-name-key";
-    private static final String PREF_SORTING_TYPE_KEY = "sorting-type-key";
-    private static final int DEFAULT_SORT_TYPE_VALUE = 1;
+    public static final String ITEMS_JSON_KEY = "items-json-key";
+    public static final String ALBUM_NAME_KEY = "album-name-key";
+    public static final String PREFS_FILE_NAME = "gallery_prefs";
+    public static final String PREF_SORTING_TYPE_KEY = "sorting-type-key";
+    public static final String PREF_SHOW_PROGRESS_BAR_KEY = "show-progress-bar-key";
+    public static final int DEFAULT_SORT_TYPE_VALUE = 1;
+    public static final boolean DEFAULT_PROGRESS_BAR_STATUS = true;
     private String mItemsJson;
     private GalleryManager mGalleryManager;
     private Toolbar mToolbar;
@@ -71,8 +77,13 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
             mGalleryManager.init(mItemsJson, listener, getSortType());
             final String name = savedInstanceState.getString(ALBUM_NAME_KEY);
             mGalleryManager.setCurrentAlbum(name);
-            updateTitle();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateTitle();
     }
 
     private void setNavigationDrawer() {
@@ -100,6 +111,16 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
             sortTypeId = R.id.sort_by_date_desc;
         }
         mNavigationView.setCheckedItem(sortTypeId);
+
+        // Set progress bar switch listener
+        final MenuItem switchItem = mNavigationView.getMenu().findItem(R.id.progress);
+        final CompoundButton switchView = (CompoundButton) MenuItemCompat.getActionView(switchItem);
+        switchView.setOnCheckedChangeListener(this);
+
+        // Set progress bar switch state
+        final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
+        final boolean isShow = sharedPref.getBoolean(PREF_SHOW_PROGRESS_BAR_KEY, DEFAULT_PROGRESS_BAR_STATUS);
+        switchView.setChecked(isShow);
 
         // Set drawer toggle
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -148,13 +169,18 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         final Fragment fragment = getCurrentFragment();
         if (fragment instanceof ImagesFragment) {
             setTitle(mGalleryManager.getCurrentAlbum().getName());
-        } else {
+            mTitle.setVisibility(View.VISIBLE);
+            mSearchView.setVisibility(View.GONE);
+        } else if (fragment instanceof AlbumsFragment) {
             setTitle(getString(R.string.app_name));
+            if (!mSearchView.isIconified()) {
+                mTitle.setVisibility(View.GONE);
+            }
         }
     }
 
     private GalleryManager.SORT_TYPE getSortType() {
-        final SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
         int value = sharedPref.getInt(PREF_SORTING_TYPE_KEY, DEFAULT_SORT_TYPE_VALUE);
         return GalleryManager.SORT_TYPE.values()[value];
     }
@@ -164,12 +190,23 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mGalleryManager.setCurrentAlbum(item);
         final Fragment fragment = ImagesFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack("").commit();
+        mTitle.setVisibility(View.VISIBLE);
+        mSearchView.setVisibility(View.GONE);
     }
 
     @Override
     public void onBackStackChanged() {
         updateTitle();
         mAppBar.setExpanded(true);
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            mSearchView.setVisibility(View.VISIBLE);
+            if (mSearchView.getQuery().length() > 0) {
+                mTitle.setVisibility(View.GONE);
+                mSearchView.clearFocus();
+            } else {
+                mSearchView.setIconified(true);
+            }
+        }
     }
 
     @Override
@@ -217,10 +254,10 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
         mGalleryManager.setSortingType(sortType);
 
-        final SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(PREF_SORTING_TYPE_KEY, sortType.ordinal());
-        editor.commit();
+        editor.apply();
 
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
@@ -245,6 +282,14 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     public boolean onQueryTextChange(String newText) {
         mGalleryManager.setFilter(newText);
         return true;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(PREF_SHOW_PROGRESS_BAR_KEY, isChecked);
+        editor.apply();
     }
 
     public class FetchDataTask extends AsyncTask<Void, Void, String> {

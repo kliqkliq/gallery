@@ -9,4 +9,5 @@
     <color name="menu">#FFF</color>
     <color name="menuItem">#999</color>
     <color name="menuItemSelected">#CCC</color>
+    <color name="progressBar">#94D0FF</color>
 </resources>

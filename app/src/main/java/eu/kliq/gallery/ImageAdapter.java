@@ -1,7 +1,10 @@
 package eu.kliq.gallery;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
@@ -24,10 +27,15 @@ public class ImageAdapter extends PagerAdapter {
 
     private Context mContext;
     private ArrayList<String> mImages;
+    private boolean mShowProgressBar;
 
     ImageAdapter(Context context, ArrayList<String> images) {
         mContext = context;
         mImages = images;
+
+        final Activity activity = (Activity) mContext;
+        final SharedPreferences sharedPref = activity.getSharedPreferences(MainActivity.PREFS_FILE_NAME, Context.MODE_PRIVATE);
+        mShowProgressBar = sharedPref.getBoolean(MainActivity.PREF_SHOW_PROGRESS_BAR_KEY, MainActivity.DEFAULT_PROGRESS_BAR_STATUS);
     }
 
     @Override
@@ -61,13 +69,19 @@ public class ImageAdapter extends PagerAdapter {
 
         final NumberProgressBar progressBar = new NumberProgressBar(mContext);
         progressBar.setVisibility(View.GONE);
+        progressBar.setProgressTextColor(ContextCompat.getColor(mContext, R.color.progressBar));
+        progressBar.setReachedBarColor(ContextCompat.getColor(mContext, R.color.progressBar));
         layout.addView(progressBar);
 
         container.addView(layout, 0);
 
-        final ProgressTarget<String, Bitmap> target = new MyProgressTarget<>(new BitmapImageViewTarget(imageView), progressBar);
-        target.setModel(imageURL);
-        Glide.with(mContext).load(imageURL).asBitmap().thumbnail(thumbnailRequest).dontAnimate().into(target);
+        if (mShowProgressBar) {
+            final ProgressTarget<String, Bitmap> target = new MyProgressTarget<>(new BitmapImageViewTarget(imageView), progressBar);
+            target.setModel(imageURL);
+            Glide.with(mContext).load(imageURL).asBitmap().thumbnail(thumbnailRequest).dontAnimate().into(target);
+        } else {
+            Glide.with(mContext).load(imageURL).asBitmap().thumbnail(thumbnailRequest).dontAnimate().into(imageView);
+        }
 
         return layout;
     }

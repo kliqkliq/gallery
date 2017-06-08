@@ -22,7 +22,7 @@
 
     <style name="MenuGroupNameTextAppearance">
         <item name="android:textColor">@color/menuItem</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>
