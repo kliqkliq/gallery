@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     public static final String PREFS_FILE_NAME = "gallery_prefs";
     public static final String PREF_SORTING_TYPE_KEY = "sorting-type-key";
     public static final String PREF_SHOW_PROGRESS_BAR_KEY = "show-progress-bar-key";
-    public static final int DEFAULT_SORT_TYPE_VALUE = 1;
+    public static final int DEFAULT_SORT_TYPE = SortingType.DATE_DESC;
     public static final boolean DEFAULT_PROGRESS_BAR_STATUS = true;
     private String mItemsJson;
     private GalleryManager mGalleryManager;
@@ -99,16 +99,27 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         menuItem.setTitle(string);
 
         // Highlight sort type
-        final GalleryManager.SORT_TYPE sortType = getSortType();
-        int sortTypeId = DEFAULT_SORT_TYPE_VALUE;
-        if (sortType == GalleryManager.SORT_TYPE.DATE_ASC) {
-            sortTypeId = R.id.sort_by_date_asc;
-        } else if (sortType == GalleryManager.SORT_TYPE.DATE_DESC) {
-            sortTypeId = R.id.sort_by_date_desc;
-        } else if (sortType == GalleryManager.SORT_TYPE.NAME_ASC) {
-            sortTypeId = R.id.sort_by_name_asc;
-        } else if (sortType == GalleryManager.SORT_TYPE.NAME_DESC) {
-            sortTypeId = R.id.sort_by_date_desc;
+        int sortTypeId;
+        switch (getSortType()) {
+            case SortingType.DATE_ASC: {
+                sortTypeId = R.id.sort_by_date_asc;
+                break;
+            }
+            case SortingType.DATE_DESC: {
+                sortTypeId = R.id.sort_by_date_desc;
+                break;
+            }
+            case SortingType.NAME_ASC: {
+                sortTypeId = R.id.sort_by_name_asc;
+                break;
+            }
+            case SortingType.NAME_DESC: {
+                sortTypeId = R.id.sort_by_name_desc;
+                break;
+            }
+            default:
+                sortTypeId = R.id.sort_by_date_desc;
+                break;
         }
         mNavigationView.setCheckedItem(sortTypeId);
 
@@ -179,10 +190,9 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         }
     }
 
-    private GalleryManager.SORT_TYPE getSortType() {
+    private int getSortType() {
         final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-        int value = sharedPref.getInt(PREF_SORTING_TYPE_KEY, DEFAULT_SORT_TYPE_VALUE);
-        return GalleryManager.SORT_TYPE.values()[value];
+        return sharedPref.getInt(PREF_SORTING_TYPE_KEY, DEFAULT_SORT_TYPE);
     }
 
     @Override
@@ -228,27 +238,27 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         final int id = item.getItemId();
-        final GalleryManager.SORT_TYPE sortType;
+        final int sortType;
 
         switch (id) {
             case R.id.sort_by_date_asc: {
-                sortType = GalleryManager.SORT_TYPE.DATE_ASC;
+                sortType = SortingType.DATE_ASC;
                 break;
             }
             case R.id.sort_by_date_desc: {
-                sortType = GalleryManager.SORT_TYPE.DATE_DESC;
+                sortType = SortingType.DATE_DESC;
                 break;
             }
             case R.id.sort_by_name_asc: {
-                sortType = GalleryManager.SORT_TYPE.NAME_ASC;
+                sortType = SortingType.NAME_ASC;
                 break;
             }
             case R.id.sort_by_name_desc: {
-                sortType = GalleryManager.SORT_TYPE.NAME_DESC;
+                sortType = SortingType.NAME_DESC;
                 break;
             }
             default:
-                sortType = GalleryManager.SORT_TYPE.DATE_ASC;
+                sortType = DEFAULT_SORT_TYPE;
                 break;
         }
 
@@ -256,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
         final SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(PREF_SORTING_TYPE_KEY, sortType.ordinal());
+        editor.putInt(PREF_SORTING_TYPE_KEY, sortType);
         editor.apply();
 
         mDrawer.closeDrawer(GravityCompat.START);

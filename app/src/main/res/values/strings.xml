@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">KLiQ.eu</string>
-    <string name="version_name" translatable="false">Galeria v%1$s</string>
+    <string name="app_name" translatable="false">KLiQ.eu</string>
+    <string name="version_name">Gallery v%1$s</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="author" translatable="false">Sebastian Klikowicz</string>
     <string name="email" translatable="false">kliqkliq@gmail.com</string>
     <string name="action_search">Search</string>
-    <string name="sort_option">Sortowanie</string>
-    <string name="name_asc">Nazwa▼</string>
-    <string name="name_desc">Nazwa▲</string>
-    <string name="date_asc">Data▼</string>
-    <string name="date_desc">Data▲</string>
-    <string name="progress_bar">Pasek postępu</string>
+    <string name="sort_option">Sorting</string>
+    <string name="name_asc">Name (A-Z)</string>
+    <string name="name_desc">Name (Z-A)</string>
+    <string name="date_asc">Oldest first</string>
+    <string name="date_desc">Newest first</string>
+    <string name="progress_bar">Progress bar</string>
 </resources>

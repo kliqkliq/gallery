@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="date_asc">Najstarsze</string>
+    <string name="date_desc">Najnowsze</string>
+    <string name="action_search">Szukaj</string>
+    <string name="name_asc">Nazwa (A-Z)</string>
+    <string name="name_desc">Nazwa (Z-A</string>
+    <string name="navigation_drawer_close">Zamknij szufladę</string>
+    <string name="navigation_drawer_open">Otwórz szufladę</string>
+    <string name="progress_bar">Pasek postępu</string>
+    <string name="sort_option">Sortowanie</string>
+    <string name="version_name">Galeria v%1$s</string>
+</resources>

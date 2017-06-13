@@ -17,15 +17,11 @@ public class GalleryManager {
     public static final String BASE_URL = "http://kliq.eu/galeria2";
     public static final String JSON_URL = BASE_URL + "/data.json";
 
-    public enum SORT_TYPE {
-        DATE_ASC, DATE_DESC, NAME_ASC, NAME_DESC
-    }
-
     private Random mRandomGenerator;
     private List<JsonItem> mItemList = new ArrayList<>();
     private List<JsonItem> mItemListFiltered = new ArrayList<>();
     private JsonItem mCurrentAlbum;
-    private SORT_TYPE mSortType;
+    private int mSortType;
     private OnListChangedListener mListener;
 
     public GalleryManager() {
@@ -45,7 +41,7 @@ public class GalleryManager {
         return null;
     }
 
-    public void init(String itemsJson, OnListChangedListener listener, SORT_TYPE sortType) {
+    public void init(String itemsJson, OnListChangedListener listener, int sortType) {
         mListener = listener;
         mSortType = sortType;
         final Gson gson = new Gson();
@@ -91,7 +87,7 @@ public class GalleryManager {
         setCurrentAlbum(getAlbum(name));
     }
 
-    public void setSortingType(SORT_TYPE type) {
+    public void setSortingType(int type) {
         if (type != mSortType) {
             mSortType = type;
             sortItems();
@@ -118,13 +114,13 @@ public class GalleryManager {
             @Override
             public int compare(JsonItem lhs, JsonItem rhs) {
                 switch (mSortType) {
-                    case NAME_ASC:
+                    case SortingType.NAME_ASC:
                         return lhs.name.compareTo(rhs.name);
-                    case NAME_DESC:
+                    case SortingType.NAME_DESC:
                         return rhs.name.compareTo(lhs.name);
-                    case DATE_ASC:
+                    case SortingType.DATE_ASC:
                         return lhs.date.compareTo(rhs.date);
-                    case DATE_DESC:
+                    case SortingType.DATE_DESC:
                         return rhs.date.compareTo(lhs.date);
                     default:
                         return rhs.date.compareTo(lhs.date);
