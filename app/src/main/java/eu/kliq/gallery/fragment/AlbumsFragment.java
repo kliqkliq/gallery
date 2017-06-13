@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,6 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import eu.kliq.gallery.adapter.AlbumsRecyclerViewAdapter;
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.activity.MainActivity;
+import eu.kliq.gallery.OnListChangedListener;
+import eu.kliq.gallery.R;
 
 public class AlbumsFragment extends Fragment implements OnListChangedListener {
 

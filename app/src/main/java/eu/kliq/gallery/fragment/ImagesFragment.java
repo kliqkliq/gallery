@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,13 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.kliq.gallery.activity.ImageActivity;
+import eu.kliq.gallery.adapter.ImagesGridViewAdapter;
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.activity.MainActivity;
+import eu.kliq.gallery.OnListChangedListener;
+import eu.kliq.gallery.R;
 
 public class ImagesFragment extends Fragment implements OnListChangedListener {
 

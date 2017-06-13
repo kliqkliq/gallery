@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.json;
 
 import java.io.BufferedReader;
 import java.io.IOException;

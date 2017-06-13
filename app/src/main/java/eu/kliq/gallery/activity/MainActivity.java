@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,6 +24,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import eu.kliq.gallery.BuildConfig;
+import eu.kliq.gallery.GalleryManager;
+import eu.kliq.gallery.json.JsonHelper;
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.OnListChangedListener;
+import eu.kliq.gallery.R;
+import eu.kliq.gallery.SortingType;
+import eu.kliq.gallery.fragment.AlbumsFragment;
+import eu.kliq.gallery.fragment.ImagesFragment;
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener,

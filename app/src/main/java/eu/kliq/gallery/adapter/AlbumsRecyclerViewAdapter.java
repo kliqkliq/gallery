@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import eu.kliq.gallery.AlbumsFragment.OnAlbumsFragmentInteractionListener;
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.R;
+import eu.kliq.gallery.fragment.AlbumsFragment.OnAlbumsFragmentInteractionListener;
 
 import java.util.List;
 

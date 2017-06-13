@@ -9,5 +9,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
-    tools:context="eu.kliq.gallery.AlbumsFragment"
+    tools:context="eu.kliq.gallery.fragment.AlbumsFragment"
     tools:listitem="@layout/album_item"/>

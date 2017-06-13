@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,6 +20,11 @@ import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.glide.ProgressTarget;
+import eu.kliq.gallery.R;
+import eu.kliq.gallery.activity.MainActivity;
+
 public class ImageAdapter extends PagerAdapter {
 
     public static final String LOG_TAG = "ImageAdapter";
@@ -29,7 +33,7 @@ public class ImageAdapter extends PagerAdapter {
     private ArrayList<String> mImages;
     private boolean mShowProgressBar;
 
-    ImageAdapter(Context context, ArrayList<String> images) {
+    public ImageAdapter(Context context, ArrayList<String> images) {
         mContext = context;
         mImages = images;
 

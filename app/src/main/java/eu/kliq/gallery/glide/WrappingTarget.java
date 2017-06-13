@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.glide;
 
 import android.graphics.drawable.Drawable;
 

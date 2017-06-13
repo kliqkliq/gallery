@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,9 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+
+import eu.kliq.gallery.json.JsonItem;
+import eu.kliq.gallery.R;
 
 public class ImagesGridViewAdapter extends ArrayAdapter<JsonItem> {
 

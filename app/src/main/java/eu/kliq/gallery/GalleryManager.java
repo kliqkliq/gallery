@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import eu.kliq.gallery.json.JsonItem;
+
 public class GalleryManager {
 
     public static final String BASE_URL = "http://kliq.eu/galeria2";

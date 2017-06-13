@@ -1,12 +1,12 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.json;
 
 import java.util.List;
 
-class JsonItem {
-    String name;
-    String date;
-    List<JsonItem> children;
-    String baseUrl;
+public class JsonItem {
+    public String name;
+    public String date;
+    public List<JsonItem> children;
+    public String baseUrl;
 
     public String getName() {
         return name;

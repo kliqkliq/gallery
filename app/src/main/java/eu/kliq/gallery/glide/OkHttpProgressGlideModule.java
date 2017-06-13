@@ -1,4 +1,4 @@
-package eu.kliq.gallery;
+package eu.kliq.gallery.glide;
 
 import android.content.Context;
 import android.os.Handler;
