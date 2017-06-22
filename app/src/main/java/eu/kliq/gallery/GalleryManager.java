@@ -17,6 +17,7 @@ import eu.kliq.gallery.json.JsonItem;
 public class GalleryManager {
 
     public static final String BASE_URL = "http://kliq.eu/galeria2";
+    public static final String ALBUMS_URL = BASE_URL + "/albums";
     public static final String JSON_URL = BASE_URL + "/data.json";
 
     private Random mRandomGenerator;
@@ -47,10 +48,10 @@ public class GalleryManager {
         mListener = listener;
         mSortType = sortType;
         final Gson gson = new Gson();
-        final Type collectionType = new TypeToken<JsonItem>(){}.getType();
-        final JsonItem data = gson.fromJson(itemsJson, collectionType);
+        final Type collectionType = new TypeToken<List<JsonItem>>(){}.getType();
+        final List<JsonItem> data = gson.fromJson(itemsJson, collectionType);
         if (data != null) {
-            mItemList = buildList(data, BASE_URL);
+            mItemList = buildList(data);
             mItemListFiltered = new ArrayList<>();
             mItemListFiltered.addAll(mItemList);
             sortItems();
@@ -60,11 +61,7 @@ public class GalleryManager {
         }
     }
 
-    private List<JsonItem> buildList(JsonItem data, String url) {
-        final List<JsonItem> list = data.getChildren();
-        final String baseUrl = url + "/" + Uri.encode(data.getName());
-        data.setBaseUrl(baseUrl);
-
+    private List<JsonItem> buildList(List<JsonItem> list) {
         if (list != null) {
             Collections.sort(list, new Comparator<JsonItem>() {
                 @Override
@@ -73,13 +70,18 @@ public class GalleryManager {
                 }
             });
             for (final JsonItem item : list) {
-                buildList(item, baseUrl);
+                setItemData(item);
             }
-            // set random thumb
-            data.setBaseUrl(list.get(mRandomGenerator.nextInt(list.size())).getBaseUrl());
         }
         return list;
     }
+
+    private void setItemData(JsonItem item) {
+        final List<String> children = item.getChildren();
+        item.url = ALBUMS_URL + "/" + Uri.encode(item.getName());
+        // set random image
+        item.albumImage = children.get(mRandomGenerator.nextInt(children.size()));
+    };
 
     public void setCurrentAlbum(JsonItem item) {
         mCurrentAlbum = item;

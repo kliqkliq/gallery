@@ -15,13 +15,13 @@ import java.util.List;
 import eu.kliq.gallery.json.JsonItem;
 import eu.kliq.gallery.R;
 
-public class ImagesGridViewAdapter extends ArrayAdapter<JsonItem> {
+public class ImagesGridViewAdapter extends ArrayAdapter<String> {
 
     private Context mContext;
     private int mLayoutResourceId;
-    private List<JsonItem> mItems;
+    private List<String> mItems;
 
-    public ImagesGridViewAdapter(Context context, int layoutResourceId, List<JsonItem> items) {
+    public ImagesGridViewAdapter(Context context, int layoutResourceId, List<String> items) {
         super(context, layoutResourceId, items);
         mContext = context;
         mLayoutResourceId = layoutResourceId;
@@ -43,8 +43,8 @@ public class ImagesGridViewAdapter extends ArrayAdapter<JsonItem> {
             holder = (ViewHolder) row.getTag();
         }
 
-        final JsonItem item = mItems.get(position);
-        Glide.with(mContext).load(item.getThumbUrl()).centerCrop().into(holder.thumbView);
+        final String url = JsonItem.getThumbUrl(mItems.get(position));
+        Glide.with(mContext).load(url).centerCrop().into(holder.thumbView);
         return row;
     }
 

@@ -41,7 +41,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         holder.mItem = item;
         holder.mNameView.setText(item.getName());
         holder.mDateView.setText(item.getDate());
-        Glide.with(holder.mThumbView.getContext()).load(item.getThumbUrl()).centerCrop().into(holder.mThumbView);
+        Glide.with(holder.mThumbView.getContext()).load(item.getAlbumThumbUrl()).centerCrop().into(holder.mThumbView);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

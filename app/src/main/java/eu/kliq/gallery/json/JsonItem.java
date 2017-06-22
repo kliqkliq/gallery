@@ -1,12 +1,14 @@
 package eu.kliq.gallery.json;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonItem {
     public String name;
     public String date;
-    public List<JsonItem> children;
-    public String baseUrl;
+    public List<String> children;
+    public String url;
+    public String albumImage;
 
     public String getName() {
         return name;
@@ -16,24 +18,34 @@ public class JsonItem {
         return date;
     }
 
-    public List<JsonItem> getChildren() {
+    public List<String> getChildren() {
         return children;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public String getThumbUrl() {
-        return getThumbUrl(baseUrl);
+    public String getAlbumImageUrl() {
+        return getImageUrl(url + "/" + albumImage);
     }
 
-    public String getImageUrl() {
-        return getImageUrl(baseUrl);
+    public String getAlbumThumbUrl() {
+        return getThumbUrl(url + "/" + albumImage);
     }
 
-    public void setBaseUrl(String url) {
-        baseUrl = url;
+    public String getImageBaseUrl(String name) {
+        return url + "/" + name;
+    }
+
+    public List<String> getImageBaseUrlList() {
+        final ArrayList<String> urls = new ArrayList<>();
+
+        for (String image : getChildren()) {
+            urls.add(getImageBaseUrl(image));
+        }
+
+        return urls;
     }
 
     public static String getImageUrl(String url) {
