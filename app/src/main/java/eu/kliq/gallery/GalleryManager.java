@@ -3,6 +3,7 @@ package eu.kliq.gallery;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -25,7 +26,8 @@ public class GalleryManager {
     private List<JsonItem> mItemListFiltered = new ArrayList<>();
     private JsonItem mCurrentAlbum;
     private int mSortType;
-    private OnListChangedListener mListener;
+    private OnListChangedListener mListChangedListener;
+    private OnErrorListener mErrorListener;
 
     public GalleryManager() {
         mRandomGenerator = new Random();
@@ -44,19 +46,31 @@ public class GalleryManager {
         return null;
     }
 
-    public void init(String itemsJson, OnListChangedListener listener, int sortType) {
-        mListener = listener;
+    public void init(String itemsJson, OnListChangedListener listChangedListener, OnErrorListener errorListener,
+                     int sortType) {
+        mListChangedListener = listChangedListener;
+        mErrorListener = errorListener;
         mSortType = sortType;
         final Gson gson = new Gson();
         final Type collectionType = new TypeToken<List<JsonItem>>(){}.getType();
-        final List<JsonItem> data = gson.fromJson(itemsJson, collectionType);
-        if (data != null) {
+        List<JsonItem> data = null;
+        
+        try {
+            data = gson.fromJson(itemsJson, collectionType);
+        } catch (JsonSyntaxException exception) {
+            mErrorListener.onJsonParsed(false);
+        }
+
+        if (data == null || data.isEmpty()) {
+            mErrorListener.onJsonParsed(false);
+        } else {
+            mErrorListener.onJsonParsed(true);
             mItemList = buildList(data);
             mItemListFiltered = new ArrayList<>();
             mItemListFiltered.addAll(mItemList);
             sortItems();
-            if (mListener != null) {
-                mListener.onListChanged();
+            if (mListChangedListener != null) {
+                mListChangedListener.onListChanged();
             }
         }
     }
@@ -77,7 +91,7 @@ public class GalleryManager {
     }
 
     private void setItemData(JsonItem item) {
-        final List<String> children = item.getChildren();
+        final List<String> children = item.getImages();
         item.url = ALBUMS_URL + "/" + Uri.encode(item.getName());
         // set random image
         item.albumImage = children.get(mRandomGenerator.nextInt(children.size()));
@@ -95,7 +109,7 @@ public class GalleryManager {
         if (type != mSortType) {
             mSortType = type;
             sortItems();
-            mListener.onSortChanged();
+            mListChangedListener.onSortChanged();
         }
     }
 
@@ -104,13 +118,20 @@ public class GalleryManager {
         if (text.isEmpty()) {
             mItemListFiltered.addAll(mItemList);
         } else {
-            for (JsonItem item: mItemList){
-                if (item.getName().toLowerCase().contains(text.toLowerCase())){
+            for (JsonItem item: mItemList) {
+                if (item.getName().toLowerCase().contains(text.toLowerCase())) {
                     mItemListFiltered.add(item);
+                } else if (item.getTags() != null) {
+                    for (String tag : item.getTags()) {
+                        if (tag.toLowerCase().contains(text.toLowerCase())) {
+                            mItemListFiltered.add(item);
+                            break;
+                        }
+                    }
                 }
             }
         }
-        mListener.onSortChanged();
+        mListChangedListener.onSortChanged();
     }
 
     private void sortItems() {

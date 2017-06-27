@@ -10,4 +10,6 @@
     <string name="progress_bar">Pasek postępu</string>
     <string name="sort_option">Sortowanie</string>
     <string name="version_name">Galeria v%1$s</string>
+    <string name="retry">Spróbuj ponownie</string>
+    <string name="error_message">Bład pobierania danych</string>
 </resources>

@@ -6,7 +6,8 @@ import java.util.List;
 public class JsonItem {
     public String name;
     public String date;
-    public List<String> children;
+    public List<String> images;
+    public List<String> tags;
     public String url;
     public String albumImage;
 
@@ -18,8 +19,12 @@ public class JsonItem {
         return date;
     }
 
-    public List<String> getChildren() {
-        return children;
+    public List<String> getImages() {
+        return images;
+    }
+
+    public List<String> getTags() {
+        return tags;
     }
 
     public String getUrl() {
@@ -41,7 +46,7 @@ public class JsonItem {
     public List<String> getImageBaseUrlList() {
         final ArrayList<String> urls = new ArrayList<>();
 
-        for (String image : getChildren()) {
+        for (String image : getImages()) {
             urls.add(getImageBaseUrl(image));
         }
 

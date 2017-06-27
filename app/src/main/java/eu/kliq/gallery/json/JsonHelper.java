@@ -10,7 +10,6 @@ import java.net.URL;
 
 public class JsonHelper {
 
-
     public static String getJSON(String url) {
         HttpURLConnection c = null;
         try {

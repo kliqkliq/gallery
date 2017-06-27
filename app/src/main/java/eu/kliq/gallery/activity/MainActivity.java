@@ -22,11 +22,14 @@ import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import eu.kliq.gallery.BuildConfig;
 import eu.kliq.gallery.GalleryManager;
+import eu.kliq.gallery.OnErrorListener;
 import eu.kliq.gallery.json.JsonHelper;
 import eu.kliq.gallery.json.JsonItem;
 import eu.kliq.gallery.OnListChangedListener;
@@ -37,7 +40,7 @@ import eu.kliq.gallery.fragment.ImagesFragment;
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener,
-        SearchView.OnQueryTextListener, CompoundButton.OnCheckedChangeListener {
+        SearchView.OnQueryTextListener, CompoundButton.OnCheckedChangeListener, OnErrorListener {
 
     public static final String ITEMS_JSON_KEY = "items-json-key";
     public static final String ALBUM_NAME_KEY = "album-name-key";
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
     private SearchView mSearchView;
+    private FrameLayout mContainerLayout;
+    private FrameLayout mErrorLayout;
+    private Button mRetryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +74,13 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mSearchView = (SearchView) findViewById(R.id.search);
+        mContainerLayout = (FrameLayout) findViewById(R.id.container);
+        mErrorLayout = (FrameLayout) findViewById(R.id.error);
+        mRetryButton = (Button) findViewById(R.id.retry_button);
 
         setNavigationDrawer();
         setSearchViewListeners();
+        setOnClickListeners();
 
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.addOnBackStackChangedListener(this);
@@ -84,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         } else {
             mItemsJson = savedInstanceState.getString(ITEMS_JSON_KEY);
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
-            mGalleryManager.init(mItemsJson, listener, getSortType());
+            mGalleryManager.init(mItemsJson, listener, this, getSortType());
             final String name = savedInstanceState.getString(ALBUM_NAME_KEY);
             mGalleryManager.setCurrentAlbum(name);
         }
@@ -168,6 +178,16 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
             }
         });
         mSearchView.setOnQueryTextListener(this);
+    }
+
+    private void setOnClickListeners() {
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final FetchDataTask task = new FetchDataTask();
+                task.execute();
+            }
+        });
     }
 
     @Override
@@ -312,6 +332,12 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         editor.apply();
     }
 
+    @Override
+    public void onJsonParsed(boolean isSuccess) {
+        mContainerLayout.setVisibility(isSuccess ? View.VISIBLE : View.GONE);
+        mErrorLayout.setVisibility(isSuccess ? View.GONE : View.VISIBLE);
+    }
+
     public class FetchDataTask extends AsyncTask<Void, Void, String> {
 
         @Override
@@ -323,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         protected void onPostExecute(String result) {
             mItemsJson = result;
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
-            mGalleryManager.init(mItemsJson, listener, getSortType());
+            mGalleryManager.init(mItemsJson, listener, MainActivity.this, getSortType());
         }
     }
 }
