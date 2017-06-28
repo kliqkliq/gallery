@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         SearchView.OnQueryTextListener, CompoundButton.OnCheckedChangeListener, OnErrorListener {
 
     public static final String ITEMS_JSON_KEY = "items-json-key";
+    public static final String ITEMS_VERSION_KEY = "items-version-key";
     public static final String ALBUM_NAME_KEY = "album-name-key";
     public static final String PREFS_FILE_NAME = "gallery_prefs";
     public static final String PREF_SORTING_TYPE_KEY = "sorting-type-key";
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     public static final int DEFAULT_SORT_TYPE = SortingType.DATE_DESC;
     public static final boolean DEFAULT_PROGRESS_BAR_STATUS = true;
     private String mItemsJson;
+    private String mItemsVersion;
     private GalleryManager mGalleryManager;
     private Toolbar mToolbar;
     private TextView mTitle;
@@ -89,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, AlbumsFragment.newInstance()).commit();
-            final FetchDataTask task = new FetchDataTask();
-            task.execute();
+            fetchData();
         } else {
             mItemsJson = savedInstanceState.getString(ITEMS_JSON_KEY);
+            mItemsVersion = savedInstanceState.getString(ITEMS_VERSION_KEY);
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
             mGalleryManager.init(mItemsJson, listener, this, getSortType());
             final String name = savedInstanceState.getString(ALBUM_NAME_KEY);
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     protected void onResume() {
         super.onResume();
         updateTitle();
+        fetchVersion();
     }
 
     private void setNavigationDrawer() {
@@ -184,8 +187,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final FetchDataTask task = new FetchDataTask();
-                task.execute();
+                fetchData();
             }
         });
     }
@@ -196,6 +198,16 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         outState.putString(ITEMS_JSON_KEY, mItemsJson);
         final JsonItem item = mGalleryManager.getCurrentAlbum();
         outState.putString(ALBUM_NAME_KEY, item == null ? "" : item.getName());
+    }
+
+    private void fetchData() {
+        final FetchDataTask task = new FetchDataTask();
+        task.execute();
+    }
+
+    private void fetchVersion() {
+        final FetchVersionTask task = new FetchVersionTask();
+        task.execute();
     }
 
     private Fragment getCurrentFragment() {
@@ -350,6 +362,25 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
             mItemsJson = result;
             final OnListChangedListener listener = (OnListChangedListener) getCurrentFragment();
             mGalleryManager.init(mItemsJson, listener, MainActivity.this, getSortType());
+        }
+    }
+
+    public class FetchVersionTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            return JsonHelper.getJSON(GalleryManager.VERSION_URL);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (!result.equals(mItemsVersion)) {
+                if (mItemsVersion != null) {
+                    fetchData();
+                }
+                mItemsVersion = result;
+
+            }
         }
     }
 }

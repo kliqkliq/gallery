@@ -19,7 +19,8 @@ public class GalleryManager {
 
     public static final String BASE_URL = "http://kliq.eu/galeria2";
     public static final String ALBUMS_URL = BASE_URL + "/albums";
-    public static final String JSON_URL = BASE_URL + "/data.json";
+    public static final String JSON_URL = BASE_URL + "/data_v2.json";
+    public static final String VERSION_URL = BASE_URL + "/version";
 
     private Random mRandomGenerator;
     private List<JsonItem> mItemList = new ArrayList<>();

@@ -74,12 +74,14 @@
                     android:id="@+id/error_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="20sp"
                     android:text="@string/error_message"/>
 
                 <Button
                     android:id="@+id/retry_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/button_margin"
                     android:text="@string/retry"/>
 
             </LinearLayout>
