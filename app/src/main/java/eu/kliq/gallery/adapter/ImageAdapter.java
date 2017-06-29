@@ -96,26 +96,28 @@ public class ImageAdapter extends PagerAdapter {
     }
 
     private static class MyProgressTarget<Z> extends ProgressTarget<String, Z> {
-        private final NumberProgressBar progress;
+        private final NumberProgressBar mProgressBar;
+        private boolean mIsDownloadStarted;
+
         public MyProgressTarget(Target<Z> target, NumberProgressBar progress) {
             super(target);
-            this.progress = progress;
-        }
-
-        @Override public float getGranualityPercentage() {
-            return 0.1f; // this matches the format string for #text below
+            mProgressBar = progress;
         }
 
         @Override protected void onConnecting() {
-            progress.setVisibility(View.VISIBLE);
         }
+
         @Override protected void onDownloading(long bytesRead, long expectedLength) {
-            progress.setProgress((int)(100 * bytesRead / expectedLength));
+            if (!mIsDownloadStarted) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                mIsDownloadStarted = true;
+            }
+            mProgressBar.setProgress((int)(100 * bytesRead / expectedLength));
         }
         @Override protected void onDownloaded() {
         }
         @Override protected void onDelivered() {
-            progress.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
         }
     }
 }

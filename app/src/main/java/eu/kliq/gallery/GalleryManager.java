@@ -66,29 +66,22 @@ public class GalleryManager {
             mErrorListener.onJsonParsed(false);
         } else {
             mErrorListener.onJsonParsed(true);
-            mItemList = buildList(data);
-            mItemListFiltered = new ArrayList<>();
+            buildList(data);
+            sortItems(mItemList);
+            mItemListFiltered.clear();
             mItemListFiltered.addAll(mItemList);
-            sortItems();
             if (mListChangedListener != null) {
                 mListChangedListener.onListChanged();
             }
         }
     }
 
-    private List<JsonItem> buildList(List<JsonItem> list) {
-        if (list != null) {
-            Collections.sort(list, new Comparator<JsonItem>() {
-                @Override
-                public int compare(JsonItem lhs, JsonItem rhs) {
-                    return lhs.name.compareTo(rhs.name);
-                }
-            });
-            for (final JsonItem item : list) {
-                setItemData(item);
-            }
+    private void buildList(List<JsonItem> list) {
+        for (final JsonItem item : list) {
+            Collections.sort(item.getImages());
+            setItemData(item);
         }
-        return list;
+        mItemList = list;
     }
 
     private void setItemData(JsonItem item) {
@@ -109,8 +102,11 @@ public class GalleryManager {
     public void setSortingType(int type) {
         if (type != mSortType) {
             mSortType = type;
-            sortItems();
-            mListChangedListener.onSortChanged();
+            sortItems(mItemList);
+            sortItems(mItemListFiltered);
+            if (mListChangedListener != null) {
+                mListChangedListener.onListChanged();
+            }
         }
     }
 
@@ -135,8 +131,8 @@ public class GalleryManager {
         mListChangedListener.onSortChanged();
     }
 
-    private void sortItems() {
-        Collections.sort(mItemListFiltered, new Comparator<JsonItem>() {
+    private void sortItems(List<JsonItem> list) {
+        Collections.sort(list, new Comparator<JsonItem>() {
             @Override
             public int compare(JsonItem lhs, JsonItem rhs) {
                 switch (mSortType) {

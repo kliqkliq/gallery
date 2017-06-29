@@ -5,7 +5,7 @@ import java.util.List;
 
 public class JsonItem {
     public String name;
-    public String date;
+    public String date = "2007-01-01";
     public List<String> images;
     public List<String> tags;
     public String url;
